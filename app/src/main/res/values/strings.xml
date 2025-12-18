@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_title">Proyecto de Algorítmica 2</string>
+    <string name="app_title">Star Fall</string>
     <string name="app_subtitle">Escoge tu Nivel de Dificultad</string>
     <string name="btn_MCM">Nivel MCM</string>
     <string name="btn_MCD">Nivel MCD</string>

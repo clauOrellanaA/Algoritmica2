@@ -33,7 +33,6 @@ class NumsPrimosGame : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Reiniciar estado del juego
         GameState.resetVidas()
         score = 0
         gameEnded = false
@@ -127,7 +126,7 @@ class NumsPrimosGame : AppCompatActivity() {
     }
 
     private fun moverMeteorito(meteoritoView: View, contenedor: ViewGroup) {
-        val alturaColision = contenedor.height * 0.60f
+        val alturaColision = contenedor.height * 0.90f
         val anim = ObjectAnimator.ofFloat(meteoritoView, "translationY", 0f, contenedor.height.toFloat())
         anim.duration = 12000
 
@@ -214,17 +213,7 @@ class NumsPrimosGame : AppCompatActivity() {
         }
     }
 
-    private fun endGameWin() {
-        val intent = Intent(this, WinningScreen::class.java)
-        startActivity(intent)
-        finish()
-    }
 
-    private fun endGameDefeat() {
-        val intent = Intent(this, LosingScreen::class.java)
-        startActivity(intent)
-        finish()
-    }
 
     fun runCriba(n: Int) {
         criba[0] = false

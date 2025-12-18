@@ -36,7 +36,6 @@
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        // Resetear vidas al iniciar el juego
         GameState.resetVidas()
 
         binding = ActivityGameScreenBinding.inflate(layoutInflater)
@@ -261,25 +260,7 @@
             startActivity(intent)
             finish()
         }
-//        private fun endGameWin() {
-//            gameEnded = true
-//            handler.removeCallbacksAndMessages(null)
-//            binding.meteoritoContainer.removeAllViews()
-//
-//            val intent = Intent(this, WinningScreen::class.java)
-//            startActivity(intent)
-//            finish()
-//        }
-//
-//        private fun endGameDefeat() {
-//            gameEnded = true
-//            handler.removeCallbacksAndMessages(null)
-//            binding.meteoritoContainer.removeAllViews()
-//
-//            val intent = Intent(this, LosingScreen::class.java)
-//            startActivity(intent)
-//            finish()
-//        }
+
 
 
         // ---------------- MCD / MCM ----------------
