@@ -15,16 +15,17 @@
     <string name="_5">5</string>
     <string name="_4">4</string>
     <string name="_9">9</string>
-    <string name="app_name">Proyecto Algoritmica 2\n</string>
-    <string name="btn_Primos">Numeros Primos\n</string>
-    <string name="false_text">False\n</string>
-    <string name="true_text">True\n</string>
-    <string name="statement_text">Identifica los numeros primos en el nivel</string>
+    <string name="app_name">Proyecto Algorítmica 2</string>
+    <string name="btn_Primos">Números Primos</string>
+    <string name="false_text">Falso</string>
+    <string name="true_text">Verdadero</string>
+    <string name="statement_text">Identifica los números primos en el nivel</string>
     <string name="congratulations">¡FELICIDADES!</string>
     <string name="win_message">Has completado el nivel</string>
-    <string name="new_game">New Game</string>
+    <string name="new_game">Nuevo Juego</string>
     <string name="game_over">GAME OVER</string>
     <string name="lose_message">Inténtalo de nuevo</string>
-    <string name="try_again">Try Again</string>
-    <string name="menu">Menu</string>
+    <string name="try_again">Intentar de Nuevo</string>
+    <string name="menu">Menú</string>
+    <string name="input_hint">Escribe el resultado</string>
 </resources>

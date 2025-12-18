@@ -3,6 +3,7 @@ package com.prograiii.algoritmica2
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -18,24 +19,43 @@ import com.prograiii.algoritmica2.databinding.ActivityNumsPrimosGameBinding
 class NumsPrimosGame : AppCompatActivity() {
 
     private lateinit var binding: ActivityNumsPrimosGameBinding
+    private val musicManager = MusicManager.getInstance()
     private var numeroSeleccionado: Int? = null
     private var meteoritoSeleccionado: View? = null
 
     private var score = 0
     private var gameEnded = false
     private val handler = Handler(Looper.getMainLooper())
-    private var vidas = 3
     private val maximo = 100
     val criba = MutableList(maximo+10) { true }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // Reiniciar estado del juego
+        GameState.resetVidas()
+        score = 0
+        gameEnded = false
+        numeroSeleccionado = null
+        meteoritoSeleccionado = null
+
         runCriba(maximo)
         binding = ActivityNumsPrimosGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        lanzarMeteoritos(binding.root as ViewGroup)
+        binding.btnGoBack.setOnClickListener {
+            gameEnded = true
+            handler.removeCallbacksAndMessages(null)
+            binding.meteoritoContainer.removeAllViews()
+            val intent = Intent(this, MainActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+            finish()
+        }
+
+        setupMusicButton()
+        iniciarCountdown()
 
         binding.btnTrue.setOnClickListener {
             verificarRespuesta(true)
@@ -55,6 +75,25 @@ class NumsPrimosGame : AppCompatActivity() {
         super.onDestroy()
         gameEnded = true
         handler.removeCallbacksAndMessages(null)
+    }
+
+    private fun iniciarCountdown() {
+        var countdown = GameState.COOLDOWN_SEGUNDOS
+        binding.inputDisplay.text = "¡Prepárate! $countdown"
+        
+        val countdownRunnable = object : Runnable {
+            override fun run() {
+                countdown--
+                if (countdown > 0) {
+                    binding.inputDisplay.text = "¡Prepárate! $countdown"
+                    handler.postDelayed(this, 1000)
+                } else {
+                    binding.inputDisplay.text = "Identifica los números primos en el nivel"
+                    lanzarMeteoritos(binding.meteoritoContainer)
+                }
+            }
+        }
+        handler.postDelayed(countdownRunnable, 1000)
     }
 
     private fun lanzarMeteoritos(contenedor: ViewGroup) {
@@ -81,7 +120,7 @@ class NumsPrimosGame : AppCompatActivity() {
                 contenedor.addView(meteoritoView)
                 moverMeteorito(meteoritoView, contenedor)
 
-                handler.postDelayed(this, 4000)
+                handler.postDelayed(this, 3500)
             }
         }
         handler.post(runnable)
@@ -100,10 +139,10 @@ class NumsPrimosGame : AppCompatActivity() {
 
                 if (meteoritoView.parent != null && meteoritoView != meteoritoSeleccionado) {
                     (meteoritoView.parent as? ViewGroup)?.removeView(meteoritoView)
-                    vidas--
-                    binding.inputDisplay.text = "Un meteorito alcanzó al pingüino. Puntos: $score | Vidas: $vidas"
+                    GameState.perderVida()
+                    binding.inputDisplay.text = "Un meteorito alcanzó al pingüino. Puntos: $score | Vidas: ${GameState.vidas}"
 
-                    if (vidas <= 0) {
+                    if (!gameEnded && GameState.vidas <= 0) {
                         terminarJuego("¡Perdiste! Se acabaron tus vidas.")
                     }
                 }
@@ -133,10 +172,13 @@ class NumsPrimosGame : AppCompatActivity() {
         val correcto = criba[numero]
         if (respuestaJugador == correcto) {
             score++
-            binding.inputDisplay.text = "¡Correcto! Puntos: $score | Vidas: $vidas"
+            binding.inputDisplay.text = "¡Correcto! Puntos: $score | Vidas: ${GameState.vidas}"
+            val anim = meteorito.tag as? ObjectAnimator
+            anim?.cancel()
+            (meteorito.parent as? ViewGroup)?.removeView(meteorito)
         } else {
-            vidas--
-            binding.inputDisplay.text = "Incorrecto. Puntos: $score | Vidas: $vidas"
+            GameState.perderVida()
+            binding.inputDisplay.text = "Incorrecto. Puntos: $score | Vidas: ${GameState.vidas}"
         }
 
         (meteorito.parent as? ViewGroup)?.removeView(meteorito)
@@ -144,19 +186,44 @@ class NumsPrimosGame : AppCompatActivity() {
         numeroSeleccionado = null
         meteoritoSeleccionado = null
 
-        if (vidas <= 0) {
+        if (!gameEnded && GameState.vidas <= 0) {
             terminarJuego("¡Perdiste! Se acabaron tus vidas.")
-        } else if (score >= 30) {
+        } else if (!gameEnded && score >= 30) {
             terminarJuego("¡Ganaste! Llegaste a 30 puntos.")
         }
     }
 
     private fun terminarJuego(mensaje: String) {
+        if (gameEnded) return
         gameEnded = true
         handler.removeCallbacksAndMessages(null)
         binding.inputDisplay.text = mensaje
         binding.btnTrue.isEnabled = false
         binding.btnFalse.isEnabled = false
+
+        if (mensaje.contains("Perdiste")) {
+            val intent = Intent(this, LosingScreen::class.java)
+            intent.putExtra("GAME", "NumsPrimosGame")
+            startActivity(intent)
+            finish()
+        } else if (mensaje.contains("Ganaste")) {
+            val intent = Intent(this, WinningScreen::class.java)
+            intent.putExtra("GAME", "NumsPrimosGame")
+            startActivity(intent)
+            finish()
+        }
+    }
+
+    private fun endGameWin() {
+        val intent = Intent(this, WinningScreen::class.java)
+        startActivity(intent)
+        finish()
+    }
+
+    private fun endGameDefeat() {
+        val intent = Intent(this, LosingScreen::class.java)
+        startActivity(intent)
+        finish()
     }
 
     fun runCriba(n: Int) {
@@ -171,5 +238,22 @@ class NumsPrimosGame : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private fun setupMusicButton() {
+        updateMusicIcon()
+        binding.btnMusicToggle.setOnClickListener {
+            musicManager.toggleMute()
+            updateMusicIcon()
+        }
+    }
+
+    private fun updateMusicIcon() {
+        val iconRes = if (musicManager.isMuted()) {
+            R.drawable.ic_volume_off
+        } else {
+            R.drawable.ic_volume_on
+        }
+        binding.btnMusicToggle.setImageResource(iconRes)
     }
 }

@@ -25,8 +25,19 @@ class LosingScreen : AppCompatActivity() {
         }
 
         binding.btnTryAgain.setOnClickListener {
+            val game = intent.getStringExtra("GAME")
+            if (game == "NumsPrimosGame") {
+                val intentGame = Intent(this, NumsPrimosGame::class.java)
+                startActivity(intentGame)
+            } else if (game == "GameScreen") {
+                val tipoOperacion = intent.getStringExtra("OPERACION")
+                val intentGame = Intent(this, GameScreen::class.java)
+                intentGame.putExtra("OPERACION", tipoOperacion)
+                startActivity(intentGame)
+            }
             finish()
         }
+
 
         binding.btnBackToMenu.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
