@@ -43,6 +43,8 @@ class NumsPrimosGame : AppCompatActivity() {
         binding = ActivityNumsPrimosGameBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        actualizarVidasUI()
+
         binding.btnGoBack.setOnClickListener {
             gameEnded = true
             handler.removeCallbacksAndMessages(null)
@@ -139,6 +141,7 @@ class NumsPrimosGame : AppCompatActivity() {
                 if (meteoritoView.parent != null && meteoritoView != meteoritoSeleccionado) {
                     (meteoritoView.parent as? ViewGroup)?.removeView(meteoritoView)
                     GameState.perderVida()
+                    actualizarVidasUI()
                     binding.inputDisplay.text = "Un meteorito alcanzó al pingüino. Puntos: $score | Vidas: ${GameState.vidas}"
 
                     if (!gameEnded && GameState.vidas <= 0) {
@@ -177,6 +180,7 @@ class NumsPrimosGame : AppCompatActivity() {
             (meteorito.parent as? ViewGroup)?.removeView(meteorito)
         } else {
             GameState.perderVida()
+            actualizarVidasUI()
             binding.inputDisplay.text = "Incorrecto. Puntos: $score | Vidas: ${GameState.vidas}"
         }
 
@@ -244,5 +248,13 @@ class NumsPrimosGame : AppCompatActivity() {
             R.drawable.ic_volume_on
         }
         binding.btnMusicToggle.setImageResource(iconRes)
+    }
+
+    private fun actualizarVidasUI() {
+        when (GameState.vidas) {
+            3 -> binding.controlStation.setImageResource(R.drawable.penguin1)
+            2 -> binding.controlStation.setImageResource(R.drawable.penguin2)
+            1 -> binding.controlStation.setImageResource(R.drawable.penguin3)
+        }
     }
 }

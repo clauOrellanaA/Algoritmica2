@@ -111,6 +111,14 @@
             }
         }
 
+        private fun actualizarVidasUI(){
+            when(GameState.vidas){
+                3 -> binding.controlStation.setImageResource(R.drawable.penguin1)
+                2 -> binding.controlStation.setImageResource(R.drawable.penguin2)
+                1 -> binding.controlStation.setImageResource(R.drawable.penguin3)
+            }
+        }
+
         // ---------------- METEORITOS ----------------
         private fun lanzarMeteoritos(contenedor: ViewGroup) {
 
@@ -213,6 +221,7 @@
 
                         if (!gameEnded && !destruidosPorJugador.contains(meteoritoView)) {
                             GameState.perderVida()
+                            actualizarVidasUI()
                             if (GameState.vidas <= 0) {
                                 endGameDefeat()
                             }
